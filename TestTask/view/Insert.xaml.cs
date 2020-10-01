@@ -28,12 +28,24 @@ namespace TestTask.view
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            AddNewCompany();
+        }
+
+        private void AddNewCompany()
+        {
             var bd = MainWindow.bd;
             if (!IsCorrectData())
             {
                 MessageBox.Show("Неверно заполнены данные", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            CreateNewCompany(bd);
+            MainWindow.FillDataGrid();
+            Close();
+        }
+
+        private void CreateNewCompany(DB bd)
+        {
             Company company = new Company()
             {
                 Name = loginTextBox.Text,
@@ -41,9 +53,8 @@ namespace TestTask.view
             };
             bd.Companies.Add(company);
             bd.SaveChanges();
-            MainWindow.datagrid.ItemsSource = bd.Companies.ToList();
-            this.Close();
         }
+
         bool IsCorrectData()
         {
             if (loginTextBox.Text.Length < 1)
@@ -54,8 +65,10 @@ namespace TestTask.view
             {
                 return false;
             }
+            
             return true;
         }
+        
     }
 }
 

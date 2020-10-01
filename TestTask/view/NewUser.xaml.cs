@@ -23,6 +23,10 @@ namespace TestTask.view
         private Company companyParent;
         public NewUser(Company company)
         {
+            if (company == null)
+            {
+                return;
+            }
             InitializeComponent();
             LoadInfo(company);
         }
@@ -35,6 +39,11 @@ namespace TestTask.view
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            AddNewUser();
+        }
+
+        private void AddNewUser()
+        {
             if (!IsCorrectData())
             {
                 MessageBox.Show("Неверно заполнены данные", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -44,7 +53,7 @@ namespace TestTask.view
             User newUser = CreateNewUser();
             MainWindow.AddNewUser(newUser);
             UsersPage.datagrid.ItemsSource = bd.Users.Where(x => x.id == newUser.id).ToList();
-            this.Close();
+            Close();
         }
 
         private User CreateNewUser()

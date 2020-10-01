@@ -20,7 +20,7 @@ namespace TestTask.view
     /// </summary>
     public partial class EditUserPage : Window
     {
-        User user;
+        private User user;
         public EditUserPage(User editUser)
         {
             InitializeComponent();
@@ -36,19 +36,33 @@ namespace TestTask.view
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            SaveAllChangesAndClose();
+        }
+
+        private void SaveAllChangesAndClose()
+        {
             if (!IsCorrectData())
             {
                 MessageBox.Show("Неверно заполнены данные", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            ChangeUserData();
+            var users = MainWindow.bd.Users.Where(x => x.id == user.id).ToList();
+            UpdateGrid(users);
+            Close();
+        }
+
+        private void ChangeUserData()
+        {
             var bd = MainWindow.bd;
-            int id = user.id;
             user.Name = nameText.Text;
             user.Password = passwordText.Text;
             bd.SaveChanges();
-            var users = MainWindow.bd.Users.Where(x => x.id == user.id).ToList();
+        }
+
+        public static void UpdateGrid(List<User> users)
+        {
             UsersPage.datagrid.ItemsSource = users;
-            this.Close();
         }
         bool IsCorrectData()
         {

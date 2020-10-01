@@ -37,31 +37,56 @@ namespace TestTask
         }
         private void addNewBtn_Click(object sender, RoutedEventArgs e)
         {
+            CreateNewCompany();
+        }
+
+        private static void CreateNewCompany()
+        {
             Insert insertPage = new Insert();
             insertPage.ShowDialog();
         }
+
         private void deleteBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            var companyDelete = myDataGrid.SelectedItem as Company;
-            if (companyDelete == null)
-            {
-                return;
-            }
-            var usersDelete = bd.Users.Where(x => x.id == companyDelete.Id);
-            if (usersDelete.Count()>0)
+            DeleteCompany();
+        }
+
+        private void DeleteCompany()
+        {
+            DeleteCompanyUsers();
+            RemoveCompany();
+            FillDataGrid();
+        }
+
+        private void RemoveCompany()
+        {
+            bd.Companies.Remove(ReturnCompany());
+            bd.SaveChanges();
+        }
+
+        private void DeleteCompanyUsers()
+        {
+            var usersDelete = bd.Users.Where(x => x.id == ReturnCompany().Id);
+            if (usersDelete.Count() > 0)
             {
                 foreach (var user in usersDelete)
                 {
                     bd.Users.Remove(user);
                 }
             }
-            
-            bd.Companies.Remove(companyDelete);
-            bd.SaveChanges();
+        }
+
+        public static void FillDataGrid()
+        {
             datagrid.ItemsSource = bd.Companies.ToList();
         }
+
         static public void AddNewUser(User newUser)
         {
+            if (newUser == null)
+            {
+                return;
+            }
             try
             {
                 bd.Users.Add(newUser);
@@ -82,23 +107,28 @@ namespace TestTask
         }
         private void editBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            var companyEdit = myDataGrid.SelectedItem as Company;
-            if (companyEdit == null)
-            {
-                return;
-            }
-            Edit editPage = new Edit(companyEdit);
+            ShowEditingForm();
+        }
+
+        private void ShowEditingForm()
+        {
+            Edit editPage = new Edit(ReturnCompany());
             editPage.ShowDialog();
+        }
+
+        private Company ReturnCompany()
+        {
+            return myDataGrid.SelectedItem as Company;
         }
 
         private void showAllBtn_Click(object sender, RoutedEventArgs e)
         {
-            var companyUsers = myDataGrid.SelectedItem as Company;
-            if (companyUsers ==null)
-            {
-                return;
-            }
-            UsersPage usersPage = new UsersPage(companyUsers);
+            ShowAllCompanyUsers();
+        }
+
+        private void ShowAllCompanyUsers()
+        {
+            UsersPage usersPage = new UsersPage(ReturnCompany());
             usersPage.ShowDialog();
         }
     }

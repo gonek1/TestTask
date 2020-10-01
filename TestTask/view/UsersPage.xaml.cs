@@ -20,12 +20,14 @@ namespace TestTask.view
     /// </summary>
     public partial class UsersPage : Window
     {
-        
         public static DataGrid datagrid;
         private Company companyParent;
         public UsersPage(Company company)
         {
-            
+            if (company == null)
+            {
+                return;
+            }
             InitializeComponent();
             LoadData(company);
         }
@@ -36,18 +38,26 @@ namespace TestTask.view
             myDataGrid.ItemsSource = users;
             datagrid = myDataGrid;
         }
-
         private void addNewbtn_Click(object sender, RoutedEventArgs e)
         {
-           
+            AddNewUser();
+        }
+
+        private void AddNewUser()
+        {
             NewUser newUserPage = new NewUser(companyParent);
             newUserPage.ShowDialog();
         }
 
         private void editUser_Click(object sender, RoutedEventArgs e)
         {
-            var user = myDataGrid.SelectedItem as User;
-            if (user==null)
+            ShowEditingForm();
+        }
+
+        private void ShowEditingForm()
+        {
+            User user = CreateNewUser();
+            if (user == null)
             {
                 return;
             }
@@ -55,19 +65,43 @@ namespace TestTask.view
             editUserPage.ShowDialog();
         }
 
+        private User CreateNewUser()
+        {
+            return myDataGrid.SelectedItem as User;
+        }
+
         private void deleteUser_Click(object sender, RoutedEventArgs e)
         {
+            DeleteUser();
+        }
+
+        private void DeleteUser()
+        {
             var bd = MainWindow.bd;
-            var user = myDataGrid.SelectedItem as User;
-            if (user==null)
+            var user = CreateNewUser();
+            if (user == null)
             {
                 return;
             }
+            DeleteUser(bd, user);
+            var users = MainWindow.bd.Users.Where(x => x.id == companyParent.Id).ToList();
+            FillGridData(users);
+        }
+
+        private void FillGridData(List<User> users)
+        {
+            myDataGrid.ItemsSource = users;
+        }
+
+        private static void DeleteUser(DB bd, User user)
+        {
             bd.Users.Remove(user);
             bd.SaveChanges();
-            var users = MainWindow.bd.Users.Where(x => x.id == companyParent.Id).ToList();
-            myDataGrid.ItemsSource = users;
+        }
 
+        public static void SetGridData(List<User> users)
+        {
+            datagrid.ItemsSource = users;
         }
     }
 }

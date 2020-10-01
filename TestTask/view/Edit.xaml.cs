@@ -20,9 +20,13 @@ namespace TestTask.view
     /// </summary>
     public partial class Edit : Window
     {
-        Company company;
+        private Company company;
         public Edit(Company company)
         {
+            if (company==null)
+            {
+                return;
+            }
             InitializeComponent();
             LoadData(company);
 
@@ -37,23 +41,33 @@ namespace TestTask.view
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            SaveAllChangesAndClose();
+        }
+
+        private void SaveAllChangesAndClose()
+        {
             if (!IsCorrectData())
             {
                 MessageBox.Show("Неверно заполнены данные", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            SaveCompanyChanges();
+            MainWindow.FillDataGrid();
+            Close();
+        }
+
+        private void SaveCompanyChanges()
+        {
             var bd = MainWindow.bd;
-            int id = company.Id;
-            Company companyEdit = (from m in bd.Companies where m.Id == id select m).Single();
+            Company companyEdit = (from m in bd.Companies where m.Id == company.Id select m).Single();
             company.Name = nameTextBox.Text;
             company.ContractStatus = comboxStatus.Text;
             bd.SaveChanges();
-            MainWindow.datagrid.ItemsSource = bd.Companies.ToList();
-            this.Close();    
         }
+
         bool IsCorrectData()
         {
-            if (nameTextBox.Text.Length < 1)
+            if (nameTextBox.Text == string.Empty)
             {
                 return false;
             }
