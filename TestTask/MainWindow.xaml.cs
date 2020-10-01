@@ -66,7 +66,8 @@ namespace TestTask
 
         private void DeleteCompanyUsers()
         {
-            var usersDelete = bd.Users.Where(x => x.id == ReturnCompany().Id);
+            int id = ReturnCompany().Id;
+            var usersDelete = bd.Users.Where(x => x.id == id);
             if (usersDelete.Count() > 0)
             {
                 foreach (var user in usersDelete)
